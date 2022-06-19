@@ -14,6 +14,8 @@ Well...
 - Easily build upon Vapor's foundation with a new object!
 ## Why did you pick the name Vapor?
 Because Vapor's style and color palette is the same as Steam's early 2000's UI. Ergo, Vapor <-> Steam.
+## WHERE THE F!@# IS THE DOCUMENTATION?!
+There is none. Read the sample .json file then read the code to get a feel for what is actually going on. Good luck!
 ## Usage
 **Engine support other than FTEQW is non-existent. Do not even try using this on QSS or DP.**
 Download the code and move menu.dat and data.json into your game's root directory. *menu.dat* is Vapor's actual QC code and *data.json* is Vapor's scheme/resource data. You don't really need much else.
