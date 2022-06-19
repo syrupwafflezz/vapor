@@ -25,6 +25,7 @@ There is also a `condition` key which will check for the value of a given consol
 If you want to show a window ONLY in the loading screen, then add the key `"show": "-1"`. Use `"1"` for when you want to show it ONLY when the game is not loading. Any other value will just hide the window regardless of context, which could be useful for testing I suppose.
 ## Usage
 **Engine support other than FTEQW is non-existent. Do not even try using this on QSS or DP.**
+
 Download the code and move menu.dat and data.json into your game's root directory. *menu.dat* is Vapor's actual QC code and *data.json* is Vapor's scheme/resource data. You don't really need much else.
 ## Build
 You can execute "compile source/make.source" in FTEQW's console, otherwise, just use FTEQCC and select make.source as the source file.
