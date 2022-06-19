@@ -10,6 +10,7 @@ Probably not. There's a lot of stuff I'd like to do in FTEQW and Vapor was just 
 Well...
 - Build a functional menu with just .json data!
 - Make a button, text, image, toggle, slider, combo, radio, text entry and action bind object with ease!
+- Create a tab view of stuff that should only be seen when viewing a single tab! (i.e. hide everything that has nothing to do with "Video", and show everything that does)
 - Customize the color scheme and mix-and-match to create a colorful menu!
 - Easily build upon Vapor's foundation with a new object!
 ## Why did you pick the name Vapor?
