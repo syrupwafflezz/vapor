@@ -17,3 +17,5 @@ Well...
 Download the code and move menu.dat and data.json into your game's root directory. menu.dat is Vapor's actual QC code and data.json is Vapor's scheme/resource data. You don't really need much else.
 ## Build
 You can execute "compile source/make.source" in FTEQW's console, otherwise, just use FTEQCC and select make.source as the source file.
+## License
+The license for Vapor is MIT. So go crazy with it. I don't particularly care.
