@@ -16,7 +16,8 @@ Well...
 ## Why did you pick the name Vapor?
 Because Vapor's style and color palette is the same as Steam's early 2000's UI. Ergo, Vapor <-> Steam.
 ## WHERE THE F!@# IS THE DOCUMENTATION?!
-There is none. Read the sample .json file then read the code to get a feel for what is actually going on in classic Quake mod fashion. Good luck, you're gonna need it!
+There is none. Read the sample .json file then read the code to get a feel for what is actually going on in classic Quake mod fashion. Good luck, you're gonna need it! Hint: you can use the `-` operator to overload the `position` and `size` key of every object. For instance, `"position" : ["-0", "-0"]` would set a window to the *right* side of the screen, at the *bottom*, in contrast to `"position" : "["0", "0"]"`, which would set it to the *left* side of the screen, at the *top*. This goes for both a window, and an object which is a child of that window, in which case, the child would be set to the far right corner of the parent window, etcetera. The "size" key is similar, only that it will resize a window or object to be as big as the screen (in the case of the window) or as big as the parent (in the case of the child object, like a button)
+In contrast, the `*` operator will position a window or object at the middle of the screen, or parent window in the case of the child object. Same logic as `size`.
 ## Usage
 **Engine support other than FTEQW is non-existent. Do not even try using this on QSS or DP.**
 Download the code and move menu.dat and data.json into your game's root directory. *menu.dat* is Vapor's actual QC code and *data.json* is Vapor's scheme/resource data. You don't really need much else.
