@@ -5,7 +5,7 @@ Vapor is a GUI framework for FTEQW which was made with the intention of being an
 ## Is it stable?
 I would consider Vapor to be mostly stable, but there will be some stuff wrong with it as I have not done much testing on it, other than testing for basic functionality.
 ## Are you going to keep maintaining this?
-Probably not. There's a lot of stuff I'd like to do in FTEQW and Vapor was just one of them. But I did spend a good amount of time in Vapor and I would rather release it as-is than not release it at all.
+Probably not. There's a lot of stuff I'd like to do in FTEQW and Vapor was just one of them. But I did spend a good amount of time in Vapor and I would rather release it as-is than not release it at all. I will most likely archive this repository once I am done uploading all of Vapor.
 ## What's the feature list?
 Well...
 - Build a functional menu with just .json data!
