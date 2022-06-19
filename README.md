@@ -12,6 +12,8 @@ Well...
 - Make a button, text, image, toggle, slider, combo, radio, text entry and action bind object with ease!
 - Customize the color scheme and mix-and-match to create a colorful menu!
 - Easily build upon Vapor's foundation with a new object!
+## Why did you pick the name Vapor?
+Because Vapor's style and color palette is the same as Steam's early 2000's UI. Ergo, Vapor <-> Steam.
 ## Usage
 **Engine support other than FTEQW is non-existent. Do not even try using this on QSS or DP.**
 Download the code and move menu.dat and data.json into your game's root directory. *menu.dat* is Vapor's actual QC code and *data.json* is Vapor's scheme/resource data. You don't really need much else.
