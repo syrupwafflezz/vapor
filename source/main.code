@@ -1,0 +1,214 @@
+/*
+Copyright 2022-2022 wither <syrupwaffle@protonmail.com>
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
+
+#define MAIN_FILE "data.json"
+
+float  menu;
+object parent;
+
+void(jsonnode node, float depth) scheme_recursion =
+{
+	#define MAIN_TYPE (node["object"].a[depth])["type"].s
+
+    if (MAIN_TYPE == "")
+        return;
+
+    object child = null;
+
+    switch((string)MAIN_TYPE)
+    {
+        case "text":
+            child = text_spawn  ((node["object"].a[depth]));
+            break;
+        case "image":
+            child = image_spawn ((node["object"].a[depth]));
+            break;
+        case "button":
+            child = button_spawn((node["object"].a[depth]));
+            break;
+        case "toggle":
+            child = toggle_spawn((node["object"].a[depth]));
+            break;
+        case "slider":
+            child = slider_spawn((node["object"].a[depth]));
+            break;
+        case "combo":
+            child = combo_spawn((node["object"].a[depth]));
+            break;
+        case "radio":
+            child = radio_spawn((node["object"].a[depth]));
+            break;
+        case "entry":
+            child = entry_spawn((node["object"].a[depth]));
+            break;
+        case "bind":
+            child = bind_spawn((node["object"].a[depth]));
+            break;
+    }
+
+    parent.child = child;
+    child.parent = parent;
+    parent       = child;
+    scheme_recursion(node, depth - 1);
+};
+
+void(string key) scheme_create =
+{
+	#define MAIN_SCHEME data["scheme"][key]
+
+    object loop;
+    for (float a = index; a > -1; a--)
+    {
+        loop = (object)hash_get(table, ftos(a), null);
+        if (loop.key == key)
+            return;
+    }
+
+    parent = window_spawn(key, MAIN_SCHEME);
+
+    if (parent.tree["show"].s != "-1")
+        parent.look();
+
+    scheme_recursion     (MAIN_SCHEME, MAIN_SCHEME["object"].length - 1);
+};
+
+void() show =
+{
+    setcursormode(TRUE, "");
+	setkeydest(2);
+	menu = 1;
+};
+
+void() hide =
+{
+	setkeydest(0);
+	menu = 0;
+};
+
+void(float wantmode) m_toggle =
+{
+	if (menu)
+		hide();
+	else
+		show();
+};
+
+void() m_init =
+{
+    float file;
+    file  = fopen(MAIN_FILE, FILE_READNL);
+    data  = json_parse(fgets(file));
+    table = hash_createtab(32);
+    null  = spawn(object, key:"", tree:__NULL__);
+    fclose(file);
+
+    cvar_set("pr_autocreatecvars", "0");
+
+    hashtable font = hash_createtab(32);
+
+    for (float a = 0; a < data["resource"].length; a++)
+    {
+        jsonnode resource_node;
+                 resource_node = data["resource"].a[a];
+
+        if (resource_node["text_font"])
+        {
+            string size  = hash_get  (font, resource_node["text_font"].s);
+                    size = strreplace(resource_node["text_size"].a[1].s,  "", size);
+                    size = strcat    (size, " ", resource_node["text_size"].a[1].s);
+
+            hash_add(font, resource_node["text_font"].s, size, HASH_REPLACE);
+        }
+    }
+
+    for (float a = 0;; a++)
+    {
+        string name = hash_getkey(font, a);
+        string size = hash_get   (font, name);
+
+        if (!name)
+            break;
+
+        loadfont(name, name, size, -1, 0, 0);
+    }
+
+    registercommand("scheme_create");
+    localcmd       (sprintf("%s\n", data["main"].s));
+	show();
+};
+
+void(vector screensize) m_draw =
+{
+	if (!menu)
+		return;
+
+	load = FALSE;
+    object loop;
+    for (float a = index; a > -1; a--)
+    {
+        loop = (object)hash_get(table, ftos(a), null);
+        if (loop != null && loop.tree["show"].s == "1")
+            loop.show();
+    }
+    screen = screensize;
+};
+
+void(vector screensize, float opaque) m_drawloading =
+{
+	opaque = TRUE;
+	load   = TRUE;
+    object loop;
+    for (float a = index; a > -1; a--)
+    {
+        loop = (object)hash_get(table, ftos(a), null);
+        if (loop != null && loop.tree["show"].s == "-1")
+            loop.show();
+    }
+    screen = screensize;
+};
+
+
+float(string cmd) m_consolecommand =
+{
+    tokenize(cmd);
+
+    switch(argv(0))
+    {
+        case "scheme_create":
+            scheme_create(argv(1));
+            return TRUE;
+            break;
+        default:
+            return -1;
+            break;
+    }
+    return FALSE;
+};
+
+float(float evtype, float scanx, float chary, float devid) Menu_InputEvent =
+{
+	if (evtype == IE_KEYUP && scanx == K_ESCAPE)
+		hide();
+
+    switch (evtype)
+    {
+        case IE_MOUSEABS:
+            cursor_x = scanx;
+            cursor_y = chary;
+            return TRUE;
+            break;
+        default:
+            if (active)
+                active.input(evtype, scanx, chary);
+                return TRUE;
+                break;
+    }
+    return FALSE;
+};
