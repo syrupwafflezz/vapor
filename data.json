@@ -1,0 +1,278 @@
+{
+    "main": "scheme_create main; scheme_create side",
+    "scheme":
+    {
+        "main":
+        {
+            "position" : ["32",  "32"],
+            "size"     : ["400", "360"],
+            "resource" : "frame",
+			"show"     : "1",
+            "tab"      : ["Video", "Audio", "Input", "Game"],
+            "object"   :
+            [
+                {
+                    "type"      : "button",
+                    "position"  : ["-8",  "-136"],
+                    "size"      : ["128", "24"],
+                    "resource"  : "button",
+                    "text"      : "OK",
+                    "button"    : "!sayonara"
+                },
+                {
+                    "type"      : "button",
+                    "position"  : ["-8",  "-104"],
+                    "size"      : ["128", "24"],
+                    "resource"  : "button",
+                    "text"      : "Apply",
+                    "button"    : "!work"
+                },
+                {
+                    "type"      : "button",
+                    "position"  : ["-8",  "-72"],
+                    "size"      : ["128", "24"],
+                    "resource"  : "button",
+                    "text"      : "Cancel",
+                    "button"    : "!hide"
+                },
+                {
+                    "tab"       : "Video",
+                    "type"      : "toggle",
+                    "position"  : ["8",  "64"],
+                    "size"      : ["128", "24"],
+                    "resource"  : "toggle",
+                    "text"      : "Volume",
+                    "value"     : "volume",
+                    "toggle"    : ["0", "1"]
+                },
+                {
+                    "tab"       : "Video",
+                    "type"      : "slider",
+                    "position"  : ["8",  "120"],
+                    "size"      : ["128", "8"],
+                    "resource"  : "slider",
+                    "text"      : "Volume",
+                    "value"     : "volume",
+                    "slider"    : ["0", "1"]
+                },
+                {
+                    "tab"       : "Video",
+                    "type"      : "combo",
+                    "position"  : ["8",  "160"],
+                    "size"      : ["128", "24"],
+                    "resource"  : "combo",
+                    "text"      : "Volume",
+                    "value"     : "volume",
+                    "combo"     :
+                    {
+                        "0"   : "0",
+                        "0.2" : "0.2",
+                        "0.5" : "0.5",
+                        "0.7" : "0.7",
+                        "1"   : "1"
+                    }
+                },
+                {
+                    "tab"       : "Video",
+                    "type"      : "radio",
+                    "position"  : ["8",  "220"],
+                    "size"      : ["128", "24"],
+                    "resource"  : "radio",
+                    "text"      : "Volume",
+                    "value"     : "volume",
+                    "radio"     :
+                    {
+                        "0"   : "0",
+                        "0.2" : "0.2",
+                        "0.5" : "0.5",
+                        "0.7" : "0.7",
+                        "1"   : "1"
+                    }
+                },
+                {
+                    "tab"       : "Video",
+                    "type"      : "entry",
+                    "position"  : ["-8",  "84"],
+                    "size"      : ["128", "24"],
+                    "resource"  : "entry",
+                    "text"      : "Volume",
+                    "value"     : "volume"
+                },
+                {
+                    "tab"       : "Video",
+                    "type"      : "bind",
+                    "position"  : ["-8",  "120"],
+                    "size"      : ["128", "24"],
+                    "resource"  : "bind",
+                    "bind"      :
+                    {
+                        "+attack" : "Attack"
+                    }
+                }
+            ]
+        },
+        "test":
+        {
+            "position" : ["-32",  "-32"],
+            "size"     : ["128", "128"],
+            "resource" : "frame",
+			"show"     : "1",
+            "tab"      : ["Video", "Audio", "Input", "Game"],
+            "object"   :
+            [
+                {
+                    "type"      : "button",
+                    "position"  : ["-8",  "-136"],
+                    "size"      : ["128", "24"],
+                    "resource"  : "button",
+                    "text"      : "OK",
+                    "button"    : "!sayonara"
+                }
+            ]
+        },
+		"side":
+        {
+            "position" : ["32",  "-32"],
+            "size"     : ["160", "24"],
+            "resource" : "frame",
+			"show"     : "-1",
+            "flag"     : ["FLAG_NOPOSITION", "FLAG_NOSIZE", "FLAG_NOHIDE"],
+            "object"   :
+            [
+                {
+                    "type"      : "text",
+                    "position"  : ["6",  "6"],
+                    "size"      : ["0",  "0"],
+                    "resource"  : "text",
+                    "text"      : "Loading..."
+                }
+			]
+		}
+    },
+    "resource":
+    {
+        "frame":
+        {
+            "color"         : ["1.000", "0.500", "0.500", "0.250"],
+            "alpha"         : ["1.000", "1.000", "1.000", "1.000"],
+            "color_main"    : ["0.300", "0.350", "0.250", "1.000"],
+            "color_line_a"  : ["0.500", "0.500", "0.500", "1.000"],
+            "color_line_b"  : ["0.150", "0.150", "0.150", "1.000"],
+            "text_position" : ["0", "0"],
+            "text_size"     : ["16", "16"],
+            "text_color"    : ["1", "1", "1", "1"],
+            "text_font"     : "arial"
+        },
+        "text":
+        {
+            "color"         : ["1.000", "0.500", "0.500", "0.250"],
+            "alpha"         : ["1.000", "1.000", "1.000", "1.000"],
+            "text_position" : ["0", "0"],
+            "text_size"     : ["16", "16"],
+            "text_color"    : ["1", "1", "1", "1"],
+            "text_font"     : "arial"
+        },
+        "image":
+        {
+            "color"         : ["1.000", "0.500", "0.500", "0.250"],
+            "alpha"         : ["1.000", "1.000", "1.000", "1.000"],
+            "image_color"   : ["1", "1", "1", "1"]
+        },
+        "button":
+        {
+            "color"         : ["1.000", "0.500", "0.500", "0.250"],
+            "alpha"         : ["1.000", "1.000", "1.000", "1.000"],
+            "color_main"    : ["0.300", "0.350", "0.250", "1.000"],
+            "color_line_a"  : ["0.500", "0.500", "0.500", "1.000"],
+            "color_line_b"  : ["0.150", "0.150", "0.150", "1.000"],
+            "text_position" : ["6", "6"],
+            "text_size"     : ["16", "16"],
+            "text_color"    : ["1", "1", "1", "1"],
+            "text_font"     : "arial"
+        },
+        "image_button":
+        {
+            "color"         : ["1.000", "0.500", "0.500", "0.250"],
+            "alpha"         : ["1.000", "1.000", "1.000", "1.000"],
+            "color_main"    : ["0.300", "0.350", "0.250", "1.000"],
+            "color_line_a"  : ["0.500", "0.500", "0.500", "1.000"],
+            "color_line_b"  : ["0.150", "0.150", "0.150", "1.000"],
+            "text_position" : ["28", "6"],
+            "text_size"     : ["16", "16"],
+            "text_color"    : ["1", "1", "1", "1"],
+            "text_font"     : "arial"
+        },
+        "toggle":
+        {
+            "color"         : ["1.000", "0.500", "0.500", "0.250"],
+            "alpha"         : ["1.000", "1.000", "1.000", "1.000"],
+            "color_main"    : ["0.300", "0.350", "0.250", "1.000"],
+            "color_line_a"  : ["0.500", "0.500", "0.500", "1.000"],
+            "color_line_b"  : ["0.150", "0.150", "0.150", "1.000"],
+            "text_position" : ["24", "6"],
+            "text_size"     : ["16", "16"],
+            "text_color"    : ["1", "1", "1", "1"],
+            "text_font"     : "arial"
+        },
+        "slider":
+        {
+            "color"         : ["1.000", "0.500", "0.500", "0.250"],
+            "alpha"         : ["1.000", "1.000", "1.000", "1.000"],
+            "color_main"    : ["0.300", "0.350", "0.250", "1.000"],
+            "color_line_a"  : ["0.500", "0.500", "0.500", "1.000"],
+            "color_line_b"  : ["0.150", "0.150", "0.150", "1.000"],
+            "text_position" : ["0", "-20"],
+            "text_size"     : ["16", "16"],
+            "text_color"    : ["1", "1", "1", "1"],
+            "text_font"     : "arial"
+        },
+        "combo":
+        {
+            "color"         : ["1.000", "0.500", "0.500", "0.250"],
+            "alpha"         : ["1.000", "1.000", "1.000", "1.000"],
+            "color_main"    : ["0.300", "0.350", "0.250", "1.000"],
+            "color_line_a"  : ["0.500", "0.500", "0.500", "1.000"],
+            "color_line_b"  : ["0.150", "0.150", "0.150", "1.000"],
+            "text_position" : ["0", "-20"],
+            "text_size"     : ["16", "16"],
+            "text_color"    : ["1", "1", "1", "1"],
+            "text_font"     : "arial"
+        },
+        "radio":
+        {
+            "color"         : ["1.000", "0.500", "0.500", "0.250"],
+            "alpha"         : ["1.000", "1.000", "1.000", "1.000"],
+            "color_main"    : ["0.300", "0.350", "0.250", "1.000"],
+            "color_line_a"  : ["0.500", "0.500", "0.500", "1.000"],
+            "color_line_b"  : ["0.150", "0.150", "0.150", "1.000"],
+            "text_position" : ["0", "-20"],
+            "text_size"     : ["16", "16"],
+            "text_color"    : ["1", "1", "1", "1"],
+            "text_font"     : "arial"
+        },
+        "entry":
+        {
+            "color"         : ["1.000", "0.500", "0.500", "0.250"],
+            "alpha"         : ["1.000", "1.000", "1.000", "1.000"],
+            "color_main"    : ["0.300", "0.350", "0.250", "1.000"],
+            "color_line_a"  : ["0.500", "0.500", "0.500", "1.000"],
+            "color_line_b"  : ["0.150", "0.150", "0.150", "1.000"],
+            "text_position" : ["0", "-20"],
+            "text_size"     : ["16", "16"],
+            "text_color"    : ["1", "1", "1", "1"],
+            "text_font"     : "arial"
+        },
+        "bind":
+        {
+            "color"         : ["1.000", "0.500", "0.500", "0.250"],
+            "alpha"         : ["1.000", "1.000", "1.000", "1.000"],
+            "color_main"    : ["0.300", "0.350", "0.250", "1.000"],
+            "color_line_a"  : ["0.500", "0.500", "0.500", "1.000"],
+            "color_line_b"  : ["0.150", "0.150", "0.150", "1.000"],
+            "text_position" : ["0", "0"],
+            "text_size"     : ["16", "16"],
+            "text_color"    : ["1", "1", "1", "1"],
+            "text_font"     : "arial"
+        }
+    }
+}
