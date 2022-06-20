@@ -1,5 +1,7 @@
 # Vapor - a GUI framework for FTEQW.
 Made by wither. A big thank you to Jaycie, Spoike, Shpuld, and eukara for support, inspiration, feedback and testing.
+
+Sample "accept.png" icon from the Silk icon set, you can find it at http://www.famfamfam.com/lab/icons/silk/.
 ## What is Vapor?
 Vapor is a GUI framework for FTEQW which was made with the intention of being an easy-to-use, drop-in solution for any game built on FTEQW. Vapor's scheme data (where a window is, what stuff does it have, where is the stuff exactly within that window, etc.) is all in a .json file for ease of use. No QuakeC coding at all!
 ## Is it stable?
