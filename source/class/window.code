@@ -1,0 +1,213 @@
+/*
+Copyright 2022-2022 wither <syrupwaffle@protonmail.com>
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
+
+#define FLAG_POSITION   1
+#define FLAG_SIZE       2
+#define FLAG_HIDE       4
+#define FLAG_NOPOSITION 8
+#define FLAG_NOSIZE     16
+#define FLAG_NOHIDE     32
+
+class window : object
+{
+    string tab;
+    vector pre_position;
+    vector pre_size;
+
+    virtual void() show =
+    {
+        super::show();
+        showborder (location + position, size, 0);
+
+        float check = overload(0, -1337, "size", 0, "-") || overload(0, -1337, "size", 1, "-") || overload(0, -1337, "size", 0, "*") || overload(0, -1337, "size", 1, "*");
+
+        if (!(flag & FLAG_NOPOSITION))
+        {
+            if (flag & FLAG_NOHIDE)
+                showborder(location + position + [8, 8], [size_x - 16, 16], flag & FLAG_POSITION);
+            else
+                showborder(location + position + [8, 8], [size_x - 40, 16], flag & FLAG_POSITION);
+        }
+
+        if (!(flag & FLAG_NOSIZE) && !check)
+            showborder(location + position + [size_x - 24, size_y - 24], [16, 16], flag & FLAG_SIZE);
+
+        if (!(flag & FLAG_NOHIDE))
+            showborder(location + position + [size_x - 24, 8], [16, 16], flag & FLAG_HIDE);
+
+        if (flag & FLAG_POSITION)
+            position = -location + cursor - pre_position;
+
+        if (flag & FLAG_SIZE)
+        {
+            vector difference = cursor - pre_position;
+            size_x = difference_x + pre_size_x;
+            size_y = difference_y + pre_size_y;
+
+            if (tree["minimum"])
+            {
+                size_x = bound(tree["minimum"].a[0].f, size_x, size_x);
+                size_y = bound(tree["minimum"].a[1].f, size_y, size_y);
+            }
+
+            if (tree["maximum"])
+            {
+                size_x = bound(size_x, size_x, tree["maximum"].a[0].f);
+                size_y = bound(size_y, size_y, tree["maximum"].a[1].f);
+            }
+        }
+
+        float value_width_1 = 0;
+        jsonnode node = data["resource"][tree["resource"].s];
+             drawfont = findfont(node["text_font"].s) - 1;
+
+        for (float a = 0; a < tree["tab"].length; a++)
+        {
+            #define VALUE_SIZE_X  data["resource"][tree["resource"].s]["text_size"].a[0].f
+            #define VALUE_SIZE_Y  data["resource"][tree["resource"].s]["text_size"].a[1].f
+            string value_name     = tree["tab"][ftos(a)].s;
+            float  value_width_0  = stringwidth(value_name, 0, [VALUE_SIZE_X, VALUE_SIZE_Y]);
+            float  value_height   = ((flag & FLAG_NOPOSITION) &&  (flag & FLAG_NOHIDE)) ? 8 : 32;
+
+            showborder(location + position + [8 + value_width_1, value_height],  [value_width_0 + 12, VALUE_SIZE_Y + 6], tab == value_name);
+            showstring(location + position + [8 + value_width_1, value_height] + [6, 6], value_name);
+
+            value_width_1 += value_width_0 + 12;
+        }
+
+        for (object loop = child; loop; loop = loop.child)
+        {
+            if (!loop.tree["tab"] || loop.tree["tab"].s == tab)
+                loop.show();
+        }
+    };
+
+    virtual void(float type, float x, float y) input =
+    {
+        if (type == IE_KEYUP && x == K_MOUSE1)
+        {
+            if (!top())
+            {
+                look();
+                return;
+            }
+        }
+
+        float check = overload(0, -1337, "size", 0, "-") || overload(0, -1337, "size", 1, "-") || overload(0, -1337, "size", 0, "*") || overload(0, -1337, "size", 1, "*");
+
+        if (type == IE_KEYUP && x == K_MOUSE1)
+        {
+            if (!top())
+                return;
+
+            flag (-) FLAG_POSITION;
+            flag (-) FLAG_SIZE;
+
+            if (!(flag & FLAG_NOHIDE))
+            {
+                if (focus(size_x - 24, (size_x - 24) + 16, 8, 8 + 16))
+                    hide();
+                else
+                    flag (-) FLAG_HIDE;
+            }
+
+            float value_width_1 = 0;
+            jsonnode node = data["resource"][tree["resource"].s];
+                 drawfont = findfont(node["text_font"].s) - 1;
+
+            for (float a = 0; a < tree["tab"].length; a++)
+            {
+                #define VALUE_SIZE_X  data["resource"][tree["resource"].s]["text_size"].a[0].f
+                #define VALUE_SIZE_Y  data["resource"][tree["resource"].s]["text_size"].a[1].f
+                string value_name     = tree["tab"][ftos(a)].s;
+                float  value_width_0  = stringwidth(value_name, 0, [VALUE_SIZE_X, VALUE_SIZE_Y]);
+                float  value_height   = ((flag & FLAG_NOPOSITION) &&  (flag & FLAG_NOHIDE)) ? 8 : 32;
+
+                #define VALUE_MIN_X 8 + value_width_1
+                #define VALUE_MAX_X VALUE_MIN_X + value_width_0 + 12
+                #define VALUE_MIN_Y value_height
+                #define VALUE_MAX_Y VALUE_MIN_Y + VALUE_SIZE_Y + 6
+
+                if (focus(VALUE_MIN_X, VALUE_MAX_X, VALUE_MIN_Y, VALUE_MAX_Y))
+                    tab = value_name;
+
+                value_width_1 += value_width_0 + 12;
+            }
+        }
+
+        if (type == IE_KEYDOWN && x == K_MOUSE1)
+        {
+            if (!top())
+                return;
+
+            if (!(flag & FLAG_NOPOSITION))
+            {
+                if (focus(8, (size_x - 40) + 8, 8, 8 + 16))
+                {
+                    pre_position = (location + position) - cursor;
+                    pre_position = -pre_position;
+                    flag (+) FLAG_POSITION;
+                }
+            }
+
+            if (!(flag & FLAG_NOSIZE) && !check)
+            {
+                if (focus(size_x - 24, (size_x - 24) + 16, (size_y - 24) , (size_y - 24) + 16))
+                {
+                    pre_position = cursor;
+                    pre_size     = size;
+                    flag (+) FLAG_SIZE;
+                }
+            }
+
+            if (!(flag & FLAG_NOHIDE))
+            {
+                if (focus(size_x - 24, (size_x - 24) + 16, 8, 8 + 16))
+                    flag (+) FLAG_HIDE;
+            }
+        }
+    };
+
+    virtual void() work =
+    {
+        for (object loop = child; loop; loop = loop.child)
+            loop.work();
+    };
+
+    virtual void() initialize =
+    {
+        super::initialize();
+
+        index++;
+        number = ftos(index - 1);
+        hash_add     (table, number, self, HASH_REPLACE);
+        flag (+) FLAG_PARENT;
+
+        for (float a = 0; a < tree["flag"].length; a++)
+        {
+            string flag_argument = tree["flag"].a[a].s;
+
+            if (flag_argument == "FLAG_NOPOSITION")
+                flag (+) FLAG_NOPOSITION;
+            else if (flag_argument == "FLAG_NOSIZE")
+                flag (+) FLAG_NOSIZE;
+            else if (flag_argument == "FLAG_NOHIDE")
+                flag (+) FLAG_NOHIDE;
+        }
+
+        if (tree["tab"])
+            tab = tree["tab"].a[0].s;
+    };
+};
+window(string key, jsonnode node) window_spawn =
+{
+    window window_entity = spawn(window, key:key, tree:node);
+    return window_entity;
+};

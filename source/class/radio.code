@@ -1,0 +1,77 @@
+/*
+Copyright 2022-2022 wither <syrupwaffle@protonmail.com>
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
+
+#define RADIO_A(a)       json_get_name(tree["radio"].a[a])
+#define RADIO_B(a)       tree["radio"][a].s
+#define RADIO_LENGTH     tree["radio"].length
+#define RADIO_SIZE       size_y / RADIO_LENGTH
+#define RADIO_SIZE_X     tree["size"].a[0].f
+#define RADIO_SIZE_Y     tree["size"].a[1].f
+#define RADIO_CHECK_A(a) click - 1 == a
+#define RADIO_CHECK_B(a) value == RADIO_A(a)
+
+class radio : element
+{
+    float click;
+
+    virtual void() show =
+    {
+        super::show();
+
+        for (float a = 0; a < RADIO_LENGTH; a++)
+        {
+            showborder(coordinate(FALSE) + [0, RADIO_SIZE * a],  [size_x, RADIO_SIZE], RADIO_CHECK_A(a));
+            showborder(coordinate(FALSE) + [0, RADIO_SIZE * a] + [RADIO_SIZE / 2 - 4, RADIO_SIZE / 2 - 4], '8 8', !(RADIO_CHECK_B(a)));
+            showstring(coordinate(FALSE) + [24, 6] + [0, RADIO_SIZE * a], RADIO_B(RADIO_A(a)));
+        }
+
+        showstring(coordinate(FALSE), __NULL__);
+    };
+
+    virtual void(float type, float x, float y) input =
+    {
+        super::input(type, x, y);
+
+        if (type == IE_KEYDOWN && x == K_MOUSE1)
+        {
+            for (float a = 0; a < RADIO_LENGTH; a++)
+            {
+                if (focus(coordinate(TRUE).x, (coordinate(TRUE).x) + size_x, coordinate(TRUE).y + RADIO_SIZE * a, (coordinate(TRUE).y + RADIO_SIZE * a) + RADIO_SIZE))
+                    click = a + 1;
+            }
+        }
+
+        if (type == IE_KEYUP && x == K_MOUSE1)
+        {
+            string key_name = json_get_name(tree["radio"].a[click - 1]);
+
+            click = 0;
+            value = key_name;
+        }
+    };
+
+    virtual void() initialize =
+    {
+        super::initialize();
+
+        for (float a = 0; a < RADIO_LENGTH - 1; a++)
+            size_y += RADIO_SIZE_Y;
+
+        position_x -= overload(0, size_x - RADIO_SIZE_X,       "position",  0, "-");
+        position_y -= overload(0, size_y - RADIO_SIZE_Y,       "position",  1, "-");
+        position_x -= overload(0, (size_x / 2) - RADIO_SIZE_X, "position",  0, "*");
+        position_y -= overload(0, (size_y / 2) - RADIO_SIZE_Y, "position",  1, "*");
+    };
+};
+radio(jsonnode node) radio_spawn =
+{
+    radio  radio_entity = spawn(radio, tree:node);
+    return radio_entity;
+};

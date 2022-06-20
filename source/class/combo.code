@@ -1,0 +1,53 @@
+/*
+Copyright 2022-2022 wither <syrupwaffle@protonmail.com>
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
+
+#define COMBO_A(a)   json_get_name(tree["combo"].a[a])
+#define COMBO_B(a)   tree["combo"][a].s
+#define COMBO_LENGTH tree["combo"].length
+
+class combo : element
+{
+    virtual void() show =
+    {
+        super::show();
+
+        if (flag & FLAG_CLICK)
+        {
+            for (float a = 0; a < COMBO_LENGTH; a++)
+            {
+                showborder(coordinate(FALSE) + [0, size_y] + [0, (size_y) * a], [size_x, size_y], 0);
+                showstring(coordinate(FALSE) + [6, 6] + [0, size_y] + [0, (size_y) * a], COMBO_B(COMBO_A(a)));
+            }
+        }
+
+        showborder(coordinate(FALSE), size, flag & FLAG_CLICK);
+        showstring(coordinate(FALSE), __NULL__);
+        showstring(coordinate(FALSE) + [6, 6], COMBO_B(value));
+    };
+
+    virtual void(float type, float x, float y) input =
+    {
+        super::input(type, x, y);
+
+        if (type == IE_KEYUP && x == K_MOUSE1)
+        {
+            for (float a = 0; a < COMBO_LENGTH; a++)
+            {
+                if (focus(coordinate(TRUE).x, (coordinate(TRUE).x) + size_x, coordinate(TRUE).y + (size_y) * (a + 1), (coordinate(TRUE).y + (size_y) * (a + 1)) + size_y))
+                    value = COMBO_A(a);
+            }
+        }
+    };
+};
+combo(jsonnode node) combo_spawn =
+{
+    combo  combo_entity = spawn(combo, tree:node);
+    return combo_entity;
+};

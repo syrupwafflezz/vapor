@@ -1,0 +1,104 @@
+/*
+Copyright 2022-2022 wither <syrupwaffle@protonmail.com>
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
+
+#define BIND_FLAG       2
+#define BIND_A(a)       json_get_name(tree["bind"].a[a])
+#define BIND_B(a)       tree["bind"][a].s
+#define BIND_LENGTH     tree["bind"].length
+#define BIND_SIZE       size_y / BIND_LENGTH
+#define BIND_SIZE_X     tree["size"].a[0].f
+#define BIND_SIZE_Y     tree["size"].a[1].f
+#define BIND_CHECK_A(a) click - 1 == a
+#define BIND_CHECK_B(a) value == BIND_A(a)
+#define BIND_NAME(a)    keynumtostring(stof(argv(a)))
+#define BIND_COMMAND(a) sprintf("unbind %s\n", BIND_NAME(a))
+
+
+class bind : element
+{
+    float click;
+
+    virtual void() show =
+    {
+        super::show();
+
+        for (float a = 0; a < BIND_LENGTH; a++)
+        {
+            tokenize(findkeysforcommand(BIND_A(a)));
+
+            showborder(coordinate(FALSE) + [0, BIND_SIZE * a], [size_x, BIND_SIZE], BIND_CHECK_A(a));
+
+            if (BIND_CHECK_A(a))
+                showstring(coordinate(FALSE) + '6 6' + [0, BIND_SIZE * a], "...");
+            else
+                showstring(coordinate(FALSE) + '6 6' + [0, BIND_SIZE * a], BIND_NAME(0));
+
+            showstring(coordinate(FALSE) + '-96 6' + [0, BIND_SIZE * a], BIND_B(BIND_A(a)));
+        }
+    };
+
+    virtual void(float type, float x, float y) input =
+    {
+        super::input(type, x, y);
+
+        if (type == IE_KEYDOWN)
+        {
+            if (click == 0)
+            {
+                if (x == K_MOUSE1)
+                {
+                    for (float a = 0; a < BIND_LENGTH; a++)
+                    {
+                        if (focus(coordinate(TRUE).x, (coordinate(TRUE).x) + size_x, coordinate(TRUE).y + BIND_SIZE * a, (coordinate(TRUE).y + BIND_SIZE * a) + BIND_SIZE))
+                            click = a + 1;
+                    }
+                }
+            }
+            else
+            {
+                string key_name = json_get_name(tree["bind"].a[click - 1]);
+
+                tokenize(findkeysforcommand(key_name));
+
+                for (float a = 0;;a++)
+                {
+                    if (argv(a) == "")
+                        break;
+                    else
+                    {
+                        if (BIND_NAME(a) != "<KEY NOT FOUND>")
+                            localcmd(BIND_COMMAND(a));
+                    }
+                }
+
+                setkeybind(x, key_name);
+                click = 0;
+            }
+        }
+    };
+
+    virtual void() initialize =
+    {
+        super::initialize();
+
+        for (float a = 0; a < BIND_LENGTH - 1; a++)
+            size_y += BIND_SIZE_Y;
+
+        position_x -= overload(0, size_x - BIND_SIZE_X,       "position",  0, "-");
+        position_y -= overload(0, size_y - BIND_SIZE_Y,       "position",  1, "-");
+        position_x -= overload(0, (size_x / 2) - BIND_SIZE_X, "position",  0, "*");
+        position_y -= overload(0, (size_y / 2) - BIND_SIZE_Y, "position",  1, "*");
+    };
+};
+bind(jsonnode node) bind_spawn =
+{
+    bind   bind_entity = spawn(bind, tree:node);
+    return bind_entity;
+};

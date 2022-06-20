@@ -1,0 +1,40 @@
+/*
+Copyright 2022-2022 wither <syrupwaffle@protonmail.com>
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
+
+#define SLIDER_MAX tree["slider"].a[1].f
+#define SLIDER_MIN tree["slider"].a[0].f
+
+class slider : element
+{
+    virtual void() show =
+    {
+        super::show();
+
+        float foo;
+
+        if (flag & FLAG_CLICK)
+        {
+            foo   = (cursor_x - coordinate(FALSE).x) / (size_x);
+            foo   = bound(0, foo, 1);
+            foo   = foo * (SLIDER_MAX - SLIDER_MIN);
+            foo  += SLIDER_MIN;
+            value = ftos(foo);
+        }
+
+        showborder(coordinate(FALSE),  size, flag & FLAG_CLICK);
+        showborder(coordinate(FALSE) - [-size_x * ((stof(value) - SLIDER_MIN) / (SLIDER_MAX - SLIDER_MIN)), 4],  [4, 16], 0);
+        showstring(coordinate(FALSE), __NULL__);
+    };
+};
+slider(jsonnode node) slider_spawn =
+{
+    slider slider_entity = spawn(slider, tree:node);
+    return slider_entity;
+};

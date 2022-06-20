@@ -1,0 +1,351 @@
+/*
+Copyright 2022-2022 wither <syrupwaffle@protonmail.com>
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
+
+#define FLAG_PARENT 64
+#define FLAG_CLICK  1
+
+class     object;
+hashtable table;
+float     index;
+jsonnode  data;
+.jsonnode tree;
+vector    screen;
+vector    cursor;
+object    active;
+object    null;
+float     priority;
+float     load;
+
+class object
+{
+    string  key;
+    string  value;
+    string  number;
+    vector  location;
+    vector  position;
+    vector  size;
+    float   flag;
+    object  parent;
+    object  child;
+
+    virtual float(float fallback, float fallforward, string node, float count, string search) overload =
+    {
+        string overload_string[]  = {tree[node].a[0].s, tree[node].a[1].s};
+
+        if (fallforward == -1 || fallforward == -1337)
+        {
+            if (fallforward == -1337)
+            {
+                overload_string[0] = substring(overload_string[0], 0, 1);
+                overload_string[1] = substring(overload_string[1], 0, 1);
+                return overload_string[count] == search;
+            }
+            else
+            {
+                overload_string[0] = strreplace(search, "", overload_string[0]);
+                overload_string[1] = strreplace(search, "", overload_string[1]);
+                return stof(overload_string[count]);
+            }
+        }
+        else
+        {
+            overload_string[0] = substring(overload_string[0], 0, 1);
+            overload_string[1] = substring(overload_string[1], 0, 1);
+        }
+
+        if (overload_string[count] == search)
+            return fallforward;
+        else
+            return fallback;
+    };
+
+    virtual float(float o1, float o2, float o3, float o4) focus =
+    {
+        return (cursor_x >= location_x + position_x + o1 && cursor_x <= location_x + position_x + o2) &&
+        (cursor_y >= location_y + position_y + o3 && cursor_y <= location_y + position_y + o4);
+    };
+
+    virtual float() top =
+    {
+		if (load)
+			return TRUE;
+
+        if (flag & FLAG_PARENT)
+            return (object)hash_get(table, "0", null) == self;
+        else
+            return (object)hash_get(table, "0", null) == parent;
+    };
+
+    virtual vector(float mode) coordinate =
+    {
+        if (!mode)
+            return parent.location + parent.position + location + position;
+        else
+            return parent.location + parent.position;
+    };
+
+    virtual void() show =
+    {
+        vector point = (parent) ? parent.size : screen;
+
+        location_x = overload(location_x, point_x,     "position", 0, "-");
+        location_y = overload(location_y, point_y,     "position", 1, "-");
+        location_x = overload(location_x, point_x / 2, "position", 0, "*");
+        location_y = overload(location_y, point_y / 2, "position", 1, "*");
+        size_x     = (overload(0, -1337, "size", 0, "-")) ? point_x +     (overload(0, -1, "size", 0, ""))  : size_x;
+        size_y     = (overload(0, -1337, "size", 1, "-")) ? point_y +     (overload(0, -1, "size", 1, ""))  : size_y;
+        size_x     = (overload(0, -1337, "size", 0, "*")) ? point_x / 2 + (overload(0, -1, "size", 0, "*")) : size_x;
+        size_y     = (overload(0, -1337, "size", 1, "*")) ? point_y / 2 + (overload(0, -1, "size", 1, "*")) : size_y;
+
+        if (focus(coordinate(TRUE).x, coordinate(TRUE).x + size_x, coordinate(TRUE).y, coordinate(TRUE).y + size_y) && !priority)
+            active = self;
+
+        while (!(parent.flag & FLAG_PARENT))
+        {
+            if (parent.parent)
+                parent = parent.parent;
+            else
+                break;
+        }
+    };
+
+    virtual void() look =
+    {
+        object t1 = hash_get(table, "0",    null);
+        object t2 = hash_get(table, number, null);
+        string t1_s = t1.number;
+        string t2_s = t2.number;
+        t1.number = t2_s;
+        t2.number = t1_s;
+
+        if (t1 == null)
+            t2.number = "0";
+
+        hash_add(table, "0",  t2, HASH_REPLACE);
+        hash_add(table, t2_s, t1, HASH_REPLACE);
+    };
+
+    virtual void() hide =
+    {
+        active = __NULL__;
+
+        if (!parent)
+        {
+            remove(hash_delete(table, number));
+            object loop;
+            for (float a = index; a > -1; a--)
+            {
+                loop = (object)hash_get(table, ftos(a), null);
+                if (loop != null && loop != self)
+                {
+                    loop.look();
+                    break;
+                }
+            } 
+        }
+
+        if (child)
+        {
+            remove(child);
+            child.hide ();
+        }
+    };
+
+    virtual void(float type, float x, float y) input =
+    {
+        if (type == IE_KEYUP && x == K_MOUSE1)
+        {
+            if (!parent.top())
+            {
+                parent.look();
+                return;
+            }
+        }
+    };
+
+    virtual float() condition =
+    {
+        string v1       = cvar_string(tree["condition"].a[0].s);
+        string operator = tree["condition"].a[1].s;
+        string v2       = tree["condition"].a[2].s;
+
+        switch (operator)
+        {
+            case "==":
+                return v1 == v2;
+                break;
+            case "!=":
+                return v1 != v2;
+                break;
+            case "<=":
+                return stof(v1) <= stof(v2);
+                break;
+            case ">=":
+                return stof(v1) >= stof(v2);
+                break;
+            case "<":
+                return stof(v1) < stof(v2);
+                break;
+            case ">":
+                return stof(v1) > stof(v2);
+                break;
+            default:
+                return -1;
+                break;
+        }
+    };
+
+    virtual void() work =
+    {
+    };
+
+    virtual vector(string name) resource_color =
+    {
+        jsonnode node        = data["resource"][tree["resource"].s];
+        vector return_result = [node[name].a[0].f, node[name].a[1].f, node[name].a[2].f];
+        if (top())
+        {
+            if (condition())
+                return return_result * node["color"].a[0].f;
+            else
+                return return_result * node["color"].a[2].f;
+        }
+        else
+        {
+            if (condition())
+                return return_result * node["color"].a[1].f;
+            else
+                return return_result * node["color"].a[3].f;
+        }
+    };
+
+    virtual float (string name) resource_alpha =
+    {
+        jsonnode node        = data["resource"][tree["resource"].s];
+        float  return_result = node[name].a[3].f;
+        if (top())
+        {
+            if (condition())
+                return return_result * node["alpha"].a[0].f;
+            else
+                return return_result * node["alpha"].a[2].f;
+        }
+        else
+        {
+            if (condition())
+                return return_result * node["alpha"].a[1].f;
+            else
+                return return_result * node["alpha"].a[3].f;
+        }
+    };
+
+    virtual void(vector p1, string s1) showstring =
+    {
+        jsonnode node  = data["resource"][tree["resource"].s];
+              drawfont = findfont(node["text_font"].s) - 1;
+
+        if (s1 != __NULL__)
+        {
+            drawstring(p1, s1, [node["text_size"].a[0].f, node["text_size"].a[1].f], resource_color("text_color"), resource_alpha("text_color"), 0);
+        }
+        else
+        {
+            drawstring(p1 + [node["text_position"].a[0].f, node["text_position"].a[1].f], tree["text"].s, [node["text_size"].a[0].f, node["text_size"].a[1].f], resource_color("text_color"), resource_alpha("text_color"), 0);
+        }
+    };
+
+    virtual void(vector p1) showimage =
+    {
+        drawpic(p1, tree["image"].s, size, resource_color("image_color"), resource_alpha("image_color"), 0);
+    };
+
+    virtual void(vector p1, vector s1, float invert) showborder =
+    {
+        vector border_color[3] = {resource_color("color_main"), resource_color("color_line_a"), resource_color("color_line_b")};
+        float  border_alpha[3] = {resource_alpha("color_main"), resource_alpha("color_line_a"), resource_alpha("color_line_b")};
+
+        if (invert)
+        {
+            border_color[1] = resource_color("color_line_b");
+            border_color[2] = resource_color("color_line_a");
+            border_alpha[1] = resource_alpha("color_line_b");
+            border_alpha[2] = resource_alpha("color_line_a");
+        }
+
+        drawfill(p1,  [s1_x, s1_y],             border_color[0], border_alpha[0], 0);
+        drawfill(p1,  [s1_x, 2],                border_color[1], border_alpha[1], 0);
+        drawfill(p1,  [2, s1_y],                border_color[1], border_alpha[1], 0);
+        drawfill(p1 + [s1_x, 0], [2, s1_y + 2], border_color[2], border_alpha[2], 0);
+        drawfill(p1 + [0, s1_y], [s1_x + 2, 2], border_color[2], border_alpha[2], 0);
+    };
+
+    virtual void() initialize =
+    {
+        position_x  = overload(0, -1,         "position",  0, "*");
+        position_y  = overload(0, -1,         "position",  1, "*");
+        size_x      = overload(0, -1,         "size",      0, "*");
+        size_y      = overload(0, -1,         "size",      1, "*");
+        position_x -= overload(0, size_x,     "position",  0, "-");
+        position_y -= overload(0, size_y,     "position",  1, "-");
+        position_x -= overload(0, size_x / 2, "position",  0, "*");
+        position_y -= overload(0, size_y / 2, "position",  1, "*");
+    };
+
+    virtual void() object =
+    {
+        initialize();
+    };
+};
+
+class element : object
+{
+    virtual void(float type, float x, float y) input =
+    {
+        super::input(type, x, y);
+
+        if (!condition())
+            return;
+
+        if (type == IE_KEYUP && x == K_MOUSE1)
+        {
+            priority = FALSE;
+
+            flag (-) FLAG_CLICK;
+        }
+
+        if (type == IE_KEYDOWN && x == K_MOUSE1)
+        {
+            if (!parent.top())
+                return;
+
+            if (flag & FLAG_CLICK)
+                return;
+
+            priority = TRUE;
+
+            flag (+) FLAG_CLICK;
+        }
+    };
+
+    virtual void() work =
+    {
+        cvar_set(tree["value"].s, value);
+
+        if (tree["command"])
+            localcmd(sprintf("%s\n", tree["command"].s));
+    };
+
+    virtual void() initialize =
+    {
+        super::initialize();
+
+        value = cvar_string(tree["value"].s);
+    };
+};
